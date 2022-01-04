@@ -10,6 +10,19 @@ const campsiteRouter = require('./routes/campsiteRouter')
 const promotionRouter = require('./routes/promotionRouter')
 const partnerRouter = require('./routes/partnerRouter')
 
+const mongoose = require('mongoose');
+
+const url = 'mongodb://localhost:27017/nucampsite';
+const connect = mongoose.connect(url, {
+    useCreateIndex: true,
+    useFindAndModify: false,
+    useNewUrlParser: true, 
+    useUnifiedTopology: true
+});
+
+connect.then(() => console.log('Connected correctly to server'), 
+    err => console.log(err)
+);
 
 var app = express();
 
@@ -31,19 +44,19 @@ function auth(req, res, next) {
       const err = new Error('You are not authenticated!');
       res.setHeader('WWW-Authenticate', 'Basic');
       err.status = 401;
-      return next(err);
+      next(err);
   }
 
   const auth = Buffer.from(authHeader.split(' ')[1], 'base64').toString().split(':');
   const user = auth[0];
   const pass = auth[1];
   if (user === 'admin' && pass === 'password') {
-      return next(); // authorized
+      next(); // authorized
   } else {
       const err = new Error('You are not authenticated!');
       res.setHeader('WWW-Authenticate', 'Basic');      
       err.status = 401;
-      return next(err);
+      next(err);
   }
 }
 
